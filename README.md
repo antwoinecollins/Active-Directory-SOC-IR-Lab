@@ -24,9 +24,9 @@
 - Splunk Enterprise (Trial)  
 - Runs DC02 + CLIENT01 VMs  
 
-**VMs (on ThinkPad)**  
-- **DC02**: Windows Server 2022, Domain Controller, `192.168.100.10` (VMnet1 Host-Only + Bridged NIC)  
-- **CLIENT01**: Windows 10/11, Domain joined, `192.168.100.20` (VMnet1 Host-Only + Bridged NIC)  
+**VMs (on Laptop)**  
+- **DC02**: Windows Server 2022, Domain Controller, `192.168.100.X2` (VMnet1 Host-Only + Bridged NIC)  
+- **CLIENT01**: Windows 10/11, Domain joined, `192.168.100.X3` (VMnet1 Host-Only + Bridged NIC)  
 - **Kali Linux** (optional, adversary simulation — Nmap, Hydra, etc.)  
 
 **Raspberry Pi5**  
@@ -92,7 +92,7 @@ outputs.conf
 [tcpout]
 defaultGroup = default-autolb-group
 [tcpout:default-autolb-group]
-server = <THINKPAD_IP>:9997
+server = <Laptop_IP>:9997
 
 
 Restart + verify
@@ -155,9 +155,9 @@ Panel 3: Security Events - Top Event Codes (pie or bar)
 
 ### Display:
 
-ThinkPad - build + manage dashboard
+Laptop - build + manage dashboard
 
-Pi5 - fullscreen display (http://<ThinkPad_IP>:8000)
+Pi5 - fullscreen display (http://<Laptop_IP>:8000)
 
 ## 🛠️ Troubleshooting Lessons
 
