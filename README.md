@@ -173,17 +173,15 @@ Firewall issues → Allowed splunkd on port 9997 through Windows Firewall.
 
 ## 📸 Screenshots & Media
 
-01_ingestion_table.png → Splunk table showing DC02 + CLIENT01 hosts
+![Splunk table showing DC02 + CLIENT01 hosts] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/soc%20cockpit_sani.png)
 
-02_dashboard_thinkpad.png → SOC Cockpit on ThinkPad
+![Sysmon service running] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/sysmon%20running_sani.png)
 
-03_dashboard_pi5.png → SOC Cockpit on Pi5 (Matrix-style)
+![Forwarder status active] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/forwarder%20started_sani.png)
 
-04_sysmon_started.png → Sysmon service running
+![Failed Logon Spike] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/cockpit%20spike_sani.png)
 
-05_forwarder_active.png → Forwarder status active
-
-media/01_cockpit_spike.mp4 → Demo clip: failed + successful logins lighting up dashboard
+![Demo clip: failed + successful logins lighting up dashboard] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/soc%3Air%20lab1_cockpitlo.mov)
 
 ## 🎶 Reflections
 
