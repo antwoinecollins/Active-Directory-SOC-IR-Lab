@@ -173,15 +173,17 @@ Firewall issues → Allowed splunkd on port 9997 through Windows Firewall.
 
 ## 📸 Screenshots & Media
 
-![Splunk table showing DC02 + CLIENT01 hosts] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/soc%20cockpit_sani.png)
+Splunk table showing DC02 + CLIENT01 hosts ![Splunk table showing DC02 + CLIENT01 hosts](https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/soc%20cockpit_sani.png)
 
-![Sysmon service running] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/sysmon%20running_sani.png)
+Sysmon service running ![Sysmon service running](https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/sysmon%20running_sani.png)
 
-![Forwarder status active] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/forwarder%20started_sani.png)
+Forwarder status active ![Forwarder status active](https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/forwarder%20started_sani.png)
 
-![Failed Logon Spike] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/cockpit%20spike_sani.png)
+Failed Logon Spike ![Failed Logon Spike](https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/cockpit%20spike_sani.png)
 
-![Demo clip: failed + successful logins lighting up dashboard] (https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/soc%3Air%20lab1_cockpitlo.mov)
+Active Directory SOC/IR Lab Architecture ![Active Directory SOC/IR Lab Architecture](https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/lab-only_diagram.png)
+
+👉 Demo clip: failed + successful logins lighting up dashboard [download raw](https://github.com/antwoinecollins/Active-Directory-SOC-IR-Lab/blob/main/soc%3Air%20lab1_cockpitlo.mov)
 
 ## 🎶 Reflections
 
