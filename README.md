@@ -1,141 +1,209 @@
-# 🛡️ Active Directory SOC / IR Lab
+# SOC + Active Directory Home Lab - Full Report
 
-## 🎯 Objective
-Build a home lab that combines **Active Directory troubleshooting**, **incident detection with Sysmon**, and **SOC/IR workflows** — with Splunk running on a **Raspberry Pi 5** as the SIEM cockpit monitor.
-
-This README documents the setup process step by step, with screenshots and notes.  
-Goal: showcase hands-on skills for SOC Analyst / Incident Response roles.
+> Precision is everything. This repo documents the complete build of my cybersecurity home lab - from setup, through errors, to final SOC Cockpit display. Every twist, mistake, and fix became part of the learning process.
 
 ---
 
-## ⚙️ Lab Topology
-
-- **DC01** → Windows Server 2022 Domain Controller (`lab.local`)
-- **CLIENT1** → Windows 10/11 domain-joined workstation
-- **KALI** → Kali Linux attacker machine
-- **Splunk Enterprise** → Raspberry Pi 5 (ARM64 build) with raw monitor
-
-**Network design:**  
-- **VMnet1 (Host-only):** 192.168.100.0/24 → isolated AD traffic  
-- **Bridged NIC:** 192.168.1.0/24 → home LAN, connects VMs to Pi5 Splunk  
-
-**Specs (per VM):**
-- DC01 → 2 vCPU, 4 GB RAM, 60 GB disk  
-- CLIENT1 → 2 vCPU, 4 GB RAM, 60 GB disk  
-- KALI → 2 vCPU, 4 GB RAM, 40 GB disk  
-- SPLUNK (Pi5) → 4-core ARM, 8 GB RAM, 128 GB SD (external SSD recommended)
+## 🎯 Lab Goals
+- Deploy a working **Active Directory domain** (Windows Server 2022 DC02 + Windows 10 client).
+- Join client machines to the domain (`lab.local`).
+- Install and configure **Sysmon** for endpoint telemetry.
+- Install and configure **Splunk Universal Forwarder** to send logs to **Splunk Enterprise**.
+- Build a **SOC dashboard (“cockpit”)** with:
+  - Failed logons (4625)
+  - Successful logons (4624)
+  - Top Security Event Codes (pie/bar)
+- Display the cockpit in real-time on a **Raspberry Pi5**.
 
 ---
 
-## 🚀 Phase 1 — Core Build
+## 🖥️ Architecture
 
-### 1. VMware Workstation Setup
-✅ Installed VMware Workstation Pro 17  
-✅ Configured **Host-only network (VMnet1)**  
-✅ Installed VMware Tools on DC01 + CLIENT1  
+**Host (ThinkPad)**  
+- VMware Workstation Pro 17  
+- Splunk Enterprise (Trial)  
+- Runs DC02 + CLIENT01 VMs  
 
-📸 `screenshots/vmnet1-settings.png`
+**VMs (on ThinkPad)**  
+- **DC02**: Windows Server 2022, Domain Controller, `192.168.100.10` (VMnet1 Host-Only + Bridged NIC)  
+- **CLIENT01**: Windows 10/11, Domain joined, `192.168.100.20` (VMnet1 Host-Only + Bridged NIC)  
+- **Kali Linux** (optional, adversary simulation — Nmap, Hydra, etc.)  
 
----
-
-### 2. Windows Server (DC01)
-- Installed Windows Server 2022 Eval ISO  
-- Promoted to Domain Controller (`lab.local`)  
-- Configured static IP: `192.168.100.10`
-
-📸 `screenshots/dc01-ipconfig.png`  
-📸 `screenshots/dc01-domain-setup.png`
+**Raspberry Pi5**  
+- Chromium browser, fullscreen dashboard view (Pi5 “SOC Cockpit”)  
 
 ---
 
-### 3. Windows 10 Client (CLIENT1)
-- Installed Windows 10 ISO  
-- Configured static IP: `192.168.100.20`  
-- Joined domain → `lab.local`  
+## ⚙️ Installation & Setup
 
-📸 `screenshots/client1-domain-login.png`  
-🎥 `video/domain-join.mp4`
-
----
-
-### 4. AD User Management
-- Created test user `jdoe`  
-- Verified account enabled + successful login  
-
-📸 `screenshots/get-aduser-jdoe.png`
-
----
-
-### 5. Sysmon Deployment
-- Deployed Sysmon (`sysmon64.exe`) + config (`sysmonconfig-export.xml`)  
-- Verified events in Event Viewer  
-
-📸 `screenshots/sysmon-install.png`  
-📸 `screenshots/sysmon-events.png`
-
----
-
-## 🚀 Phase 2 — Attack, Detect & Respond
-
-### 1. Kali Attacker Setup
-- Installed Kali Linux on VMnet1  
-- Tools: `nmap`, `hydra`, `evil-winrm`, `mimikatz`
-
----
-
-### 2. Adversary Simulation
-- Recon with `nmap`  
-- Credential spray with `hydra`  
-- Attempted WinRM login  
-
-📸 `screenshots/kali-nmap.png`  
-📸 `screenshots/kali-cme.png`
-
----
-
-### 3. Detection in Splunk (ThinkPad host)
-- Installed Splunk Universal Forwarder on DC01 + CLIENT1  
-- Forwarded Sysmon + Security logs  
-- Built dashboards for failed logons (4625) & process creation (EID 1)  
-
-📸 `screenshots/splunk-sysmon-events.png`  
-📸 `screenshots/splunk-detection-timeline.png`
-
----
-
-### 4. Response Actions
-- Disabled compromised user  
-- Pulled Sysmon history of attack  
-
-📸 `screenshots/adaccount-disable.png`
-
----
-
-## 🚀 Phase 3 — Splunk Pi5 Cockpit Upgrade
-
-### 1. Pi5 Setup
-- Installed Raspberry Pi OS 64-bit  
-- Downloaded Splunk ARM64 tarball  
-- Extracted to `/opt/splunk`  
-- Started Splunk as `splunk` user → Web UI at `http://192.168.1.50:8000`
-
-📸 `screenshots/pi5-splunk-start.png`
-
----
-
-### 2. Dual-NIC Networking
-- DC01 & CLIENT1 each configured with **two NICs**:
-  - Host-only (`192.168.100.x`) for AD/DNS
-  - Bridged (`192.168.1.x`) for Splunk connectivity  
-- Default gateway only on Bridged NIC  
-
-📸 `screenshots/vm-dual-nic.png`  
-📸 `screenshots/ipconfig-dual-nic.png`
-
----
-
-### 3. Forwarders to Pi5
-On DC01 + CLIENT1:
+### A. Sysmon
 ```powershell
-& "C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe" add forward-server 192.168.1.50:9997 -auth admin:YOURPASS
-& "C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe" add monitor "C:\Windows\System32\winevt\Logs\Microsoft-Windows-Sysmon%4Operational.evtx" -index sysmon -sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational -auth admin:YOURPASS
+# Move sysmon64.exe + config to C:\Tools\Sysmon
+Set-Location C:\Tools\Sysmon
+
+# Example config (saved as sysmonconfig-export.xml)
+@'
+<Sysmon schemaversion="4.82">
+  <HashAlgorithms>sha256</HashAlgorithms>
+  <EventFiltering>
+    <ProcessCreate onmatch="include"/>
+    <NetworkConnect onmatch="include"/>
+    <ImageLoad onmatch="include"/>
+    <ProcessTerminate onmatch="include"/>
+    <DriverLoad onmatch="include"/>
+    <CreateRemoteThread onmatch="include"/>
+    <RawAccessRead onmatch="include"/>
+    <ProcessAccess onmatch="include"/>
+    <FileCreate onmatch="include"/>
+    <FileCreateTime onmatch="include"/>
+    <RegistryEvent onmatch="include"/>
+    <FileCreateStreamHash onmatch="include"/>
+    <PipeEvent onmatch="include"/>
+    <WmiEvent onmatch="include"/>
+    <DnsQuery onmatch="include"/>
+  </EventFiltering>
+</Sysmon>
+'@ | Out-File "C:\Tools\Sysmon\sysmonconfig-export.xml" -Encoding ASCII
+
+# Install Sysmon with config
+.\sysmon64.exe -accepteula -i .\sysmonconfig-export.xml
+
+# Verify
+Get-Service sysmon64
+Get-WinEvent -ListLog Microsoft-Windows-Sysmon/Operational -MaxEvents 3
+```
+
+## B. Splunk Universal Forwarder (on DC02 + CLIENT01)
+```
+inputs.conf
+
+[WinEventLog://Security]
+disabled = 0
+[WinEventLog://System]
+disabled = 0
+[WinEventLog://Application]
+disabled = 0
+[WinEventLog://Microsoft-Windows-Sysmon/Operational]
+disabled = 0
+
+
+outputs.conf
+
+[tcpout]
+defaultGroup = default-autolb-group
+[tcpout:default-autolb-group]
+server = <THINKPAD_IP>:9997
+
+
+Restart + verify
+
+& "C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe" restart
+& "C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe" list forward-server
+```
+## C. VMware Networking (dual-NIC pattern)
+
+Adapter 1: VMnet1 (Host-Only) → AD traffic only
+
+Adapter 2: VMnet0 (Bridged) → connects VM traffic to ThinkPad (Splunk)
+.\sysmon64.exe -accepteula -i .\sysmonconfig-export.xml
+
+# Verify
+``Get-Service sysmon64
+Get-WinEvent -ListLog Microsoft-Windows-Sysmon/Operational -MaxEvents 3``
+
+##🔎 Splunk Queries Used
+
+Check ingestion
+
+``index=* host=* | stats count by host sourcetype``
+
+
+Failed logons (4625)
+
+``index=* (host=DC02 OR host=CLIENT01) sourcetype=WinEventLog:Security EventCode=4625
+| timechart span=1m count by host``
+
+
+Successful logons (4624)
+
+``index=* (host=DC02 OR host=CLIENT01) sourcetype=WinEventLog:Security EventCode=4624
+| timechart span=1m count by host``
+
+
+Top Security Event Codes
+
+``index=* (host=DC02 OR host=CLIENT01) sourcetype=WinEventLog:Security
+| stats count by EventCode
+| sort - count | head 10``
+
+
+Sysmon Process Creates (if sourcetype available)
+
+``index=* (host=DC02 OR host=CLIENT01) (sourcetype=*Sysmon* OR source="*Microsoft-Windows-Sysmon/Operational*")
+| eval Code = coalesce(EventCode, EventID)
+| where Code=1
+| stats count by host, Image, User
+| sort - count | head 20``
+
+## 📊 SOC Cockpit Dashboard
+
+Panel 1: Failed Logons (4625) - line chart
+
+Panel 2: Successful Logons (4624) - line chart
+
+Panel 3: Security Events - Top Event Codes (pie or bar)
+
+### Display:
+
+ThinkPad - build + manage dashboard
+
+Pi5 - fullscreen display (http://<ThinkPad_IP>:8000)
+
+## 🛠️ Troubleshooting Lessons
+
+VM not reaching Splunk → Needed dual-NIC setup (VMnet1 + Bridged).
+
+Splunk UF no events → inputs.conf was saved as .txt → must save with no extension.
+
+Sysmon subscription error (errorCode=5) → fixed by running SplunkForwarder under LocalSystem + resetting channel ACL.
+
+Host showed as WIN_XXXX in Splunk → set [default] host = CLIENT01 in inputs.conf or rename computer.
+
+Firewall issues → Allowed splunkd on port 9997 through Windows Firewall.
+
+## 📸 Screenshots & Media
+
+01_ingestion_table.png → Splunk table showing DC02 + CLIENT01 hosts
+
+02_dashboard_thinkpad.png → SOC Cockpit on ThinkPad
+
+03_dashboard_pi5.png → SOC Cockpit on Pi5 (Matrix-style)
+
+04_sysmon_started.png → Sysmon service running
+
+05_forwarder_active.png → Forwarder status active
+
+media/01_cockpit_spike.mp4 → Demo clip: failed + successful logins lighting up dashboard
+
+## 🎶 Reflections
+
+Music production taught me: if the signal flow is wrong, nothing works.
+
+Cybersecurity taught me: if routing, DNS, or event channels are wrong, detection fails.
+
+In both, precision builds clarity.
+
+## 🚀 Next Steps
+
+Phase 3: Add Kali attacks (Hydra brute-force, Nmap scans).
+
+Phase 4: Enrich Splunk with detection rules (Sigma → Splunk).
+
+Phase 5: Explore Dockerized Splunk on Pi5 for full ARM-native cockpit.
+
+## 📖 Author
+
+Antwoine Collins - Documenting my pivot into cybersecurity through labs, projects, and persistence.
+
+LinkedIn: https://www.linkedin.com/in/antwoinecollins/
+
