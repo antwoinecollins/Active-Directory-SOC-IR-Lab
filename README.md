@@ -193,11 +193,19 @@ Cybersecurity taught me: if routing, DNS, or event channels are wrong, detection
 
 In both, precision builds clarity.
 
+### Phase 3 (New) — Linux Endpoint + Pi SOC Cockpit
+Added a Linux endpoint (Ubuntu) that forwards syslog and auth logs into Splunk.  
+Built a Pi5 SOC Cockpit dashboard to visualize SSH and sudo activity across Windows and Linux hosts.  
+[View Part 3 →][labs/part3-linux-splunk/README.md](https://github.com/antwoinecollins/Linux-Endpoint-Splunk-Integration)
+
+
 ## 🚀 Next Steps
 
-Phase 3: Add Kali attacks (Hydra brute-force, Nmap scans).
+Phase 4: Add Atomic Red Team runs (safe subset) and map detections to ATT&CK.
 
-Phase 4: Enrich Splunk with detection rules (Sigma → Splunk).
+Add osquery for richer endpoint telemetry.
+
+Harden Splunk certs (production-ready).
 
 Phase 5: Explore Dockerized Splunk on Pi5 for full ARM-native cockpit.
 
